@@ -1,0 +1,49 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is a simple test of the Echo framework.",
+        "title": "Simple Echo Test",
+        "contact": {},
+        "version": "1.0"
+    },
+    "host": "localhost:1234",
+    "basePath": "/",
+    "paths": {
+        "/hello": {
+            "get": {
+                "description": "Returns Hello, World!",
+                "summary": "Returns Hello, World!",
+                "operationId": "hello",
+                "responses": {
+                    "200": {
+                        "description": "ok",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/user": {
+            "post": {
+                "description": "Adds a new user to the list of Users",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "summary": "Add a new User",
+                "operationId": "add-user",
+                "responses": {
+                    "200": {
+                        "description": "Returns new user",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}

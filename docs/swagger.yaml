@@ -1,0 +1,33 @@
+basePath: /
+host: localhost:1234
+info:
+  contact: {}
+  description: This is a simple test of the Echo framework.
+  title: Simple Echo Test
+  version: "1.0"
+paths:
+  /hello:
+    get:
+      description: Returns Hello, World!
+      operationId: hello
+      responses:
+        "200":
+          description: ok
+          schema:
+            type: string
+      summary: Returns Hello, World!
+  /user:
+    post:
+      consumes:
+      - application/json
+      description: Adds a new user to the list of Users
+      operationId: add-user
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Returns new user
+          schema:
+            type: string
+      summary: Add a new User
+swagger: "2.0"
