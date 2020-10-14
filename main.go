@@ -1,11 +1,13 @@
 package main
 
 import (
-	"github.com/ericdube/echoexample/customMiddleware"
+	"github.com/ericdube/echoexample/logger"
 	"net/http"
 	"sync/atomic"
 
 	_ "github.com/ericdube/echoexample/docs"
+	"github.com/ericdube/echoexample/models"
+
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 	"github.com/swaggo/echo-swagger" // echo-swagger middleware
@@ -17,12 +19,6 @@ import (
 
 // @host localhost:1234
 // @BasePath /
-
-// User struct
-type User struct {
-	Name string `json::"name"`
-	UserID int64 `json:"userID"`
-}
 
 // Declare a local userCount
 var userCount int64
@@ -43,16 +39,18 @@ func main() {
 	e := echo.New()
 
 	//Declare new custom logger
-	logTest := customMiddleware.NewLogger()
+	if err := logger.NewLogger(); err != nil {
+		return
+	}
 
 	// Middleware
-	e.Use(logTest.Process)
+	e.Use(logger.Logger.Process)
 	e.Use(middleware.Recover())
 	e.GET("/swagger/*", echoSwagger.WrapHandler)
 
 	// Routes
 	e.GET("/hello", hello)
-	e.POST("/user", user)
+	e.POST("/user", addUser)
 
 	// Start server
 	e.Logger.Fatal(e.Start(":1234"))
@@ -68,7 +66,7 @@ func hello(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello, World!")
 }
 
-// user
+// addUser
 // @Summary Add a new User
 // @Description Adds a new user to the list of Users
 // @ID add-user
@@ -76,9 +74,9 @@ func hello(c echo.Context) error {
 // @Produce  json
 // @Success 200 {string} string	"Returns new user"
 // @Router /user [post]
-func user(c echo.Context) error {
+func addUser(c echo.Context) error {
 	// Create a new user
-	u := new(User)
+	u := new(models.User)
 	// Bind the request body to the new user
 	if err := c.Bind(u); err != nil {
 		return err
@@ -86,7 +84,8 @@ func user(c echo.Context) error {
 
 	u.UserID = incUserCount()
 
-	//TODO: Do something with new User
+	//Save user to persistance store
+	models.SaveUser(u)
 
 	// Return new user
 	return c.JSON(http.StatusOK, u)

@@ -1,4 +1,4 @@
-package customMiddleware
+package logger
 
 import (
 	"os"
@@ -7,17 +7,24 @@ import (
 	"github.com/labstack/echo"
 )
 
+//Declare a global logger so anyone can log using this one
+var Logger *Logging
+
 type (
 	Logging struct {
 		Logger       *logger.Logger
 	}
 )
 
-func NewLogger() *Logging {
+// NewLogger
+// @Summary Creates a new Logger
+// @Description Creates a logger to be used to save logs
+// @ID new-logger
+func NewLogger() error {
 	//Get current working directory to dump logs to
 	path, err := os.Getwd()
 	if err != nil {
-		return nil
+		return err
 	}
 
 	//Open a file to write logs to
@@ -26,12 +33,18 @@ func NewLogger() *Logging {
 		logger.Fatalf("Failed to open log file: %v", err)
 	}
 	//Return a new Logging struct with a Logger already Init-ed
-	return &Logging{
+	Logger = &Logging{
 		Logger:   logger.Init("LoggerExample", true, true, lf),
 	}
+
+	// Return nil to make sure the caller doesnt think theres an error
+	return nil
 }
 
-// Process is the customMiddleware function.
+// Process
+// @Summary Handles an echo middleware to add logs
+// @Description Processes Echo requests using the middleware and saves the logs using the created logger
+// @ID logger-process
 func (t *Logging) Process(next echo.HandlerFunc) echo.HandlerFunc {
 	//Return a function of type echo Context to be used by the middleware
 	return func(c echo.Context) error {
